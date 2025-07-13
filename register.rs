@@ -7,14 +7,10 @@ pub fn register() {
     registry.register(RegistrableEntity::Tag(Tag::new(ID::new("ruz", "fuel"))));
 
     registry.register(RegistrableEntity::Item(Item::new(
-        ID::new("ruztex", "coal"), vec![ID::new("ruz", "fuel")],
+        ID::new("ruztex", "coal"), vec![ID::new("ruz", "fuel")], 64,
     )));
 
     registry.register(RegistrableEntity::Block(Block::new(
         ID::new("ruztex", "coal"), vec![ID::new("ruz", "fuel")], 5.0,
-    )));
-
-    registry.register(RegistrableEntity::Block(Block::new(
-        ID::new("ruztex", "coal_block"), vec![ID::new("ruz", "fuel")], 4.0,
     )));
 }

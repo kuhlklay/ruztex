@@ -1,15 +1,16 @@
 mod color;
 mod registries;
 mod register;
-mod interface;
+mod localization;
 
 #[allow(unused_imports)]
 use std::{thread, time::Duration};
 use std::collections::HashMap;
 
-use registries::REGISTRY;
+use registries::{REGISTRY, ID};
 use register::register;
 use color::{Color, ColorRef, GradientDirection};
+use localization::{Language, Translator, TranslationID};
 
 fn main() -> Result<(), String> {
     // Add custom colors
@@ -98,6 +99,18 @@ fn main() -> Result<(), String> {
             println!("  {}: {}", typ, entity_id);
         }
     }
+
+    let lang = Language { name: "Deutsch".to_string(), code: "en_US".to_string() };
+    let translator = Translator::load(lang.clone(), format!("lang/{}.yaml", lang.code)).unwrap();
+
+
+    // Ohne Platzhalter
+    println!("{}", translator.translate(&TranslationID::from("examplemod:item.hammer"), None)); // z.B. "Hammer" oder fallback "examplemod:item.hammer"
+
+    // Mit Platzhalter
+    let mut vars = HashMap::new();
+    vars.insert("player", "Kuhly");
+    println!("{}", translator.translate(&TranslationID::from("examplemod:misc.greeting"), Some(&vars))); // z.B. "Hallo, Kuhly!"
 
     Ok(())
 }

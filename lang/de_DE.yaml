@@ -1,0 +1,3 @@
+examplemod:item.hammer: "Hammer"
+examplemod:block.coal: "Kohleblock"
+examplemod:misc.greeting: "Hallo, {player}!"
