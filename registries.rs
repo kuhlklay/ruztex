@@ -55,6 +55,17 @@ impl ID {
     }
 }
 
+impl From<&str> for ID {
+    fn from(value: &str) -> Self {
+        let parts: Vec<&str> = value.splitn(2, ':').collect();
+        if parts.len() == 2 {
+            ID::new(parts[0], parts[1])
+        } else {
+            panic!("Invalid ID format: '{}'. Expected format: 'namespace:name'", value);
+        }
+    }
+}
+
 impl Display for ID {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "{}:{}", self.namespace, self.name)

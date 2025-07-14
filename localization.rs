@@ -1,5 +1,4 @@
-use std::{collections::HashMap, fs, path::Path};
-use serde::Deserialize;
+use std::{collections::HashMap, fs, path::Path, borrow::Cow};
 use regex::Regex;
 use crate::registries::ID;
 
@@ -22,7 +21,8 @@ impl TranslationID {
     pub fn from_id(id: &ID, c: &str) -> Self {
         // ID:  "namespace:name"
         // TID: "namespace:category.name"
-        let parts: Vec<&str> = id.to_string().splitn(2, ':').collect();
+        let binding = id.clone().to_string();
+        let parts: Vec<&str> = binding.splitn(2, ':').collect();
         return Self {
             namespace: parts[0].to_string(),
             category: c.to_string(),
@@ -136,22 +136,30 @@ impl Translator {
         Ok(Self { language, translations })
     }
 
-    pub fn translate(&self, id: &TranslationID, vars: Option<&HashMap<&str, &str>>) -> String {
+    pub fn set_language(&mut self, language: Language) {
+        self.language = language;
+    }
+
+    pub fn translate<'a>(&self, id: &TranslationID, vars: Option<&HashMap<&str, Cow<'a, str>>>) -> String {
         if let Some(translation) = self.translations.get(id) {
             if let Some(vars) = vars {
-                // Platzhalter ersetzen
-                let mut result = translation.clone();
-                for (key, value) in vars {
-                    // Regex für Platzhalter: {key}
-                    let re = Regex::new(&format!(r"\{{{}\}}", key)).unwrap();
-                    result = re.replace_all(&result, *value).to_string();
-                }
-                result
+                let re = Regex::new(r"%(\{([a-z][a-zA-Z0-9_]*)\}|[a-zA-Z0-9])").unwrap();
+                re.replace_all(translation, |caps: &regex::Captures| {
+                    let key = if let Some(m) = caps.get(2) {
+                        m.as_str()
+                    } else {
+                        caps.get(1).unwrap().as_str()
+                    };
+
+                    match vars.get(key) {
+                        Some(val) => Cow::Borrowed(val.as_ref()),
+                        None => Cow::Owned(caps.get(0).unwrap().as_str().to_owned()),
+                    }
+                }).into_owned()
             } else {
                 translation.clone()
             }
         } else {
-            // Fallback: "namespace:category.name" oder "item.category.name"
             format!("{}:{}.{}", id.namespace, id.category, id.name)
         }
     }

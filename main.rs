@@ -6,11 +6,11 @@ mod localization;
 #[allow(unused_imports)]
 use std::{thread, time::Duration};
 use std::collections::HashMap;
+use std::borrow::Cow;
 
-use registries::{REGISTRY, ID};
-use register::register;
-use color::{Color, ColorRef, GradientDirection};
+use registries::REGISTRY;
 use localization::{Language, Translator, TranslationID};
+use color::{Color, ColorRef, GradientDirection};
 
 fn main() -> Result<(), String> {
     // Add custom colors
@@ -20,7 +20,7 @@ fn main() -> Result<(), String> {
     let _ = color::add_color("pastel", "red", Color::from_hex("#ff7f7f"));
 
     // Print colored text
-    println!(
+    /* println!(
         "{}\n\n",
         color::coloredText("Hello, World!", &ColorRef::Named("pastel", "red"))?
     );
@@ -86,7 +86,7 @@ fn main() -> Result<(), String> {
             GradientDirection::Horizontal,
             Some(false)
         )?
-    );
+    ); */
 
     register::register();
 
@@ -103,14 +103,35 @@ fn main() -> Result<(), String> {
     let lang = Language { name: "Deutsch".to_string(), code: "en_US".to_string() };
     let translator = Translator::load(lang.clone(), format!("lang/{}.yaml", lang.code)).unwrap();
 
-
     // Ohne Platzhalter
     println!("{}", translator.translate(&TranslationID::from("examplemod:item.hammer"), None)); // z.B. "Hammer" oder fallback "examplemod:item.hammer"
 
     // Mit Platzhalter
-    let mut vars = HashMap::new();
-    vars.insert("player", "Kuhly");
-    println!("{}", translator.translate(&TranslationID::from("examplemod:misc.greeting"), Some(&vars))); // z.B. "Hallo, Kuhly!"
+    println!("{}", translator.translate(&TranslationID::from("examplemod:misc.greeting"), Some(&HashMap::from([
+        ("p", Cow::Owned(color::colored_text("Kuhly", &ColorRef::Named("custom", "my_red")).unwrap())),
+    ])))); // z.B. "Hallo, Kuhly!"
 
+    println!("{}", translator.translate(&TranslationID::from("examplemod:misc.greeting"), Some(&HashMap::from([
+        ("p", Cow::Owned(color::rainbow_text("Kuhly", GradientDirection::Horizontal, Some(true)).unwrap())),
+    ])))); // z.B. "Hallo, Kuhly!"
+
+    println!("{}", translator.translate(&TranslationID::from("examplemod:misc.coca_cola"), Some(&HashMap::from([
+        ("c", Cow::Owned(format!("{}, {} - {}",
+        color::gradient_text("Coca Cola Light", &[
+            ColorRef::Direct(Color::from_hex("#2A7B9B")),
+            ColorRef::Direct(Color::from_hex("#88AA78")),
+            ColorRef::Direct(Color::from_hex("#EDDD53")),
+        ], GradientDirection::Horizontal, Some(true)).unwrap(),
+        color::gradient_text("Coca Cola Normal", &[
+            ColorRef::Direct(Color::from_hex("#2A7B9B")),
+            ColorRef::Direct(Color::from_hex("#88AA78")),
+            ColorRef::Direct(Color::from_hex("#53C9ED")),
+        ], GradientDirection::Horizontal, Some(true)).unwrap(),
+        color::gradient_text("Coca Cola Z-z-z-zeroooo", &[
+            ColorRef::Direct(Color::from_hex("#9B5D2A")),
+            ColorRef::Direct(Color::from_hex("#AA7895")),
+            ColorRef::Direct(Color::from_hex("#53C9ED")),
+        ], GradientDirection::Horizontal, Some(true)).unwrap()))),
+    ]))));
     Ok(())
 }

@@ -297,7 +297,7 @@ pub fn rainbow_text(
     gradient_text(text, &rainbow, direction, align_gradient)
 }
 
-pub fn coloredText(
+pub fn colored_text(
     text: &str,
     color_ref: &ColorRef,
 ) -> Result<String, String> {

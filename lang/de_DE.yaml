@@ -1,3 +1,4 @@
 examplemod:item.hammer: "Hammer"
 examplemod:block.coal: "Kohleblock"
-examplemod:misc.greeting: "Hallo, {player}!"
+examplemod:misc.greeting: "Hallo, %p!"
+examplemod:misc.coca_cola: "Coca... Coala? NEIN! Es ist %c!"
