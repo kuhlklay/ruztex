@@ -18,6 +18,17 @@ impl TranslationID {
             name: name.to_string(),
         }
     }
+
+    pub fn from_id(id: &ID, c: &str) -> Self {
+        // ID:  "namespace:name"
+        // TID: "namespace:category.name"
+        let parts: Vec<&str> = id.to_string().splitn(2, ':').collect();
+        return Self {
+            namespace: parts[0].to_string(),
+            category: c.to_string(),
+            name: parts[1].to_string(),
+        };
+    }
 }
 
 impl From<&str> for TranslationID {
